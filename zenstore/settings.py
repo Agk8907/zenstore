@@ -61,8 +61,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-MEDIA_URL = '/images/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
+
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ==============================================
@@ -121,3 +121,39 @@ else:
     # Localhost fallback
     MEDIA_URL = '/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# ==============================================
+# CLOUDINARY STORAGE (FORCED FOR RENDER)
+# ==============================================
+import os
+
+# Check if we are running on Render
+if 'RENDER' in os.environ:
+    print("--- PRODUCTION MODE DETECTED: ENABLING CLOUDINARY ---")
+    
+    # 1. Ensure Cloudinary Apps are loaded
+    INSTALLED_APPS += [
+        'cloudinary_storage',
+        'cloudinary',
+    ]
+
+    # 2. Configure Keys
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+        'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+        'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+    }
+
+    # 3. Force Django to use Cloudinary for Images
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    
+    # 4. Print for debugging (Check Render Logs if this fails)
+    if not CLOUDINARY_STORAGE['CLOUD_NAME']:
+        print("!!! WARNING: CLOUDINARY_CLOUD_NAME IS MISSING in Environment Variables !!!")
+
+else:
+    # Localhost settings
+    print("--- LOCAL MODE: USING HARD DRIVE STORAGE ---")
+    MEDIA_URL = '/images/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
