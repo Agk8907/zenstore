@@ -60,8 +60,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+
 
 
 
@@ -85,8 +85,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your-email@gmail.com'    # <--- REPLACE THIS
 EMAIL_HOST_PASSWORD = 'your-app-password'   # <--- REPLACE THIS (Use App Password, not login password)
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
 # DATABASE CONFIGURATION
 if 'DATABASE_URL' in os.environ:
     DATABASES = {
@@ -185,3 +185,19 @@ else:
     print("--- SETTINGS: CONFIGURING LOCAL STORAGE ---")
     MEDIA_URL = '/images/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
+
+
+# ==============================================
+# STATIC FILES (CSS/JS) CONFIGURATION
+# ==============================================
+STATIC_URL = '/static/'
+
+if not DEBUG:
+    # Production (Render)
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+else:
+    # Localhost
+    STATICFILES_DIRS = [
+        os.path.join(BASE_DIR, 'static')
+    ]
