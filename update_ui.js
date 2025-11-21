@@ -2,113 +2,157 @@ const fs = require('fs');
 const path = require('path');
 
 const PROJECT_ROOT = process.cwd();
-const APP_NAME = 'zenstore';
-const settingsPath = path.join(PROJECT_ROOT, APP_NAME, 'settings.py');
+const APP_NAME = 'zenstore'; // The folder containing settings.py
 
-console.log("=== APPLYING ABSOLUTE STATIC FILE FIX ===");
+console.log("=== REVERTING TO LOCALHOST VERSION (REMOVING DEPLOYMENT CONFIGS) ===");
 
-if (fs.existsSync(settingsPath)) {
-    let settings = fs.readFileSync(settingsPath, 'utf8');
+// --- 1. RESTORE CLEAN SETTINGS.PY ---
+const settingsContent = `
+"""
+Django settings for zenstore project.
+RESTORED TO LOCAL DEVELOPMENT VERSION.
+"""
 
-    // ---------------------------------------------------------
-    // STEP 1: CLEANUP (Remove ANY existing static/media config)
-    // ---------------------------------------------------------
-    // We wipe the slate clean to ensure no conflicting lines exist.
-    settings = settings.replace(/^STATIC_URL = .*$/gm, '');
-    settings = settings.replace(/^STATIC_ROOT = .*$/gm, '');
-    settings = settings.replace(/^STATICFILES_DIRS = .*$/gm, '');
-    settings = settings.replace(/^STATICFILES_STORAGE = .*$/gm, '');
-    settings = settings.replace(/^MEDIA_URL = .*$/gm, '');
-    settings = settings.replace(/^MEDIA_ROOT = .*$/gm, '');
-    settings = settings.replace(/^DEFAULT_FILE_STORAGE = .*$/gm, '');
-    settings = settings.replace(/^CLOUDINARY_STORAGE = \{[\s\S]*?\}/gm, '');
-    
-    // Remove middleware if it was added messily before
-    settings = settings.replace(/'whitenoise.middleware.WhiteNoiseMiddleware',/g, '');
-    settings = settings.replace(/"whitenoise.middleware.WhiteNoiseMiddleware",/g, '');
-
-    // ---------------------------------------------------------
-    // STEP 2: RE-INJECT MIDDLEWARE (Crucial Position)
-    // ---------------------------------------------------------
-    // WhiteNoise MUST be directly after SecurityMiddleware
-    if (settings.includes("SecurityMiddleware")) {
-        settings = settings.replace(
-            /('django\.middleware\.security\.SecurityMiddleware',)/,
-            "$1\n    'whitenoise.middleware.WhiteNoiseMiddleware',"
-        );
-        console.log("✅ WhiteNoise Middleware injected correctly.");
-    } else {
-        console.error("⚠️ Could not find SecurityMiddleware to place WhiteNoise!");
-    }
-
-    // ---------------------------------------------------------
-    // STEP 3: APPEND THE "GOLD STANDARD" CONFIG
-    // ---------------------------------------------------------
-    const finalConfig = `
-# ==============================================
-# FINAL STATIC & MEDIA CONFIGURATION
-# ==============================================
+from pathlib import Path
 import os
 
-# 1. STATIC FILES (CSS/JS)
-STATIC_URL = '/static/'
-# Where Django looks for your CSS files locally
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'django-insecure-reverted-local-key'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+ALLOWED_HOSTS = []
+
+# Application definition
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'store', # Your Main App
 ]
-# Where Django puts them for production (Render)
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# 2. STORAGE ENGINE (WhiteNoise for CSS, Cloudinary for Images)
-if 'RENDER' in os.environ:
-    # --- PRODUCTION ---
-    # Use WhiteNoise to compress and serve CSS/JS
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    
-    # Use Cloudinary for uploaded images
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-        'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
-        'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'zenstore.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'zenstore.wsgi.application'
+
+# Database
+# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    # --- LOCALHOST ---
-    MEDIA_URL = '/images/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
-`;
-
-    fs.writeFileSync(settingsPath, settings + "\n" + finalConfig);
-    console.log("✅ Settings completely rewritten for Static/Media stability.");
-
-} else {
-    console.error("❌ settings.py not found.");
 }
 
-// ---------------------------------------------------------
-// STEP 4: VERIFY BUILD SCRIPT
-// ---------------------------------------------------------
-const buildPath = path.join(PROJECT_ROOT, 'build.sh');
-const buildScript = `#!/usr/bin/env bash
-# Exit on error
-set -o errexit
+# Password validation
+AUTH_PASSWORD_VALIDATORS = []
 
-# Install dependencies
-pip install -r requirements.txt
+# Internationalization
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True
 
-# CRITICAL: Collect static files
-echo "Running Collectstatic..."
-python manage.py collectstatic --no-input --clear
+# --- STATIC FILES (CSS/JS) ---
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
 
-# Apply migrations
-python manage.py migrate
+# --- MEDIA FILES (IMAGES) - LOCAL STORAGE ---
+MEDIA_URL = '/images/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
+
+# --- CUSTOM USER MODEL ---
+AUTH_USER_MODEL = 'store.User'
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# RAZORPAY CONFIG (Keep these if you want to test payments locally)
+# Replace with your TEST keys if needed
+RAZORPAY_KEY_ID = 'rzp_test_YOUR_ID_HERE'
+RAZORPAY_KEY_SECRET = 'YOUR_SECRET_HERE'
+
+# EMAIL CONFIG (Keep for local testing)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your-email@gmail.com'
+EMAIL_HOST_PASSWORD = 'your-app-password'
 `;
-fs.writeFileSync(buildPath, buildScript);
-console.log("✅ build.sh updated to force clean collectstatic.");
+
+const settingsPath = path.join(PROJECT_ROOT, APP_NAME, 'settings.py');
+fs.writeFileSync(settingsPath, settingsContent);
+console.log("✅ settings.py restored to Local Mode (SQLite + Local Images).");
+
+// --- 2. DELETE DEPLOYMENT FILES ---
+const filesToDelete = ['build.sh', 'Procfile', 'render.yaml'];
+
+filesToDelete.forEach(file => {
+    const filePath = path.join(PROJECT_ROOT, file);
+    if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        console.log(`🗑️  Deleted deployment file: ${file}`);
+    }
+});
+
+// --- 3. CLEAN REQUIREMENTS.TXT ---
+// We remove gunicorn, whitenoise, psycopg2, cloudinary
+const reqPath = path.join(PROJECT_ROOT, 'requirements.txt');
+if (fs.existsSync(reqPath)) {
+    const localReqs = `
+asgiref
+Django
+Pillow
+pytz
+razorpay
+sqlparse
+    `.trim();
+    fs.writeFileSync(reqPath, localReqs);
+    console.log("✅ requirements.txt restored to local dependencies.");
+}
 
 console.log("\n=======================================");
-console.log("       FIX DEPLOYED! 🚀");
+console.log("       BACK TO LOCALHOST! 🏠");
 console.log("=======================================");
-console.log("1. git add .");
-console.log("2. git commit -m 'Absolute Static File Fix'");
-console.log("3. git push origin main");
+console.log("1. Your project is now running on SQLite3 again.");
+console.log("2. Images will load from your local folder.");
+console.log("3. CSS will load instantly.");
+console.log("4. Run: python manage.py runserver");
