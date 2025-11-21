@@ -28,6 +28,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -213,7 +214,7 @@ else:
 # STATIC FILES CONFIGURATION (CSS/JS)
 # ==============================================
 
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
 
 # Production Settings (Render)
 if 'RENDER' in os.environ:
@@ -261,12 +262,12 @@ else:
 import os
 
 # 1. STATIC FILES (CSS/JS) - HANDLED BY WHITENOISE
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+
+
 
 # Enable WhiteNoise Compression for CSS/JS
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 # 2. MEDIA FILES (IMAGES) - HANDLED BY CLOUDINARY
 if 'RENDER' in os.environ:
@@ -283,5 +284,38 @@ if 'RENDER' in os.environ:
     
 else:
     # --- LOCAL: Use Hard Drive ---
+    MEDIA_URL = '/images/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
+
+
+# ==============================================
+# FINAL STATIC & MEDIA CONFIGURATION
+# ==============================================
+import os
+
+# 1. STATIC FILES (CSS/JS)
+STATIC_URL = '/static/'
+# Where Django looks for your CSS files locally
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+# Where Django puts them for production (Render)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# 2. STORAGE ENGINE (WhiteNoise for CSS, Cloudinary for Images)
+if 'RENDER' in os.environ:
+    # --- PRODUCTION ---
+    # Use WhiteNoise to compress and serve CSS/JS
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    
+    # Use Cloudinary for uploaded images
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+        'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+        'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+    }
+else:
+    # --- LOCALHOST ---
     MEDIA_URL = '/images/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
