@@ -14,6 +14,8 @@ INSTALLED_APPS = [
     
     
     
+    
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -269,7 +271,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # 2. MEDIA FILES (IMAGES) - HANDLED BY CLOUDINARY
 if 'RENDER' in os.environ:
     # --- PROD: Use Cloudinary for Images ---
-    INSTALLED_APPS += [ 'cloudinary']
+    
     
     CLOUDINARY_STORAGE = {
         'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
