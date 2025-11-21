@@ -12,6 +12,8 @@ INSTALLED_APPS = [
     'cloudinary',
     
     
+    
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
