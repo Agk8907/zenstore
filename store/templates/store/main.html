@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <title>ZenStore</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <script>
+        var user = '{{request.user}}';
+        function getToken(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        var csrftoken = getToken('csrftoken');
+        // Fallback if cookie is missing, though template tag is safer
+        function getCsrfToken() {
+             const input = document.querySelector('[name=csrfmiddlewaretoken]');
+             return input ? input.value : csrftoken;
+        }
+    </script>
+</head>
+<body>
+    {% csrf_token %}
+    
+    <div id="toast-container"></div>
+
+    <header>
+        <div class="navbar-top">
+            <a href="{% url 'home' %}" class="brand-logo spa-link">Zen<span>Store</span></a>
+            <div class="nav-options">
+                <a href="{% url 'home' %}" class="nav-link spa-link">Home</a>
+                <a href="{% url 'products' %}" class="nav-link spa-link">Products</a>
+                <a href="{% url 'wishlist' %}" class="nav-link spa-link">Wishlist</a>
+                <a href="{% url 'cart' %}" class="nav-link spa-link cart-nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-badge" class="cart-badge" data-count="{{cartItems}}">{{cartItems}}</span>
+                </a>
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'profile' %}" class="account-btn spa-link" title="My Account">{{request.user.email|slice:":1"|upper}}</a>
+                {% else %}
+                     <a href="{% url 'login' %}" class="account-btn" title="Login/Register"><i class="fas fa-user"></i></a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div id="main-content" class="container">
+        {% block content %}
+        {% endblock content %}
+    </div>
+
+    <footer class="zen-footer">
+        <div class="zen-foot-top-btn" onclick="window.scrollTo({top:0, behavior:'smooth'});">Back to top</div>
+        <div class="zen-foot-main">
+            <div class="zen-foot-container">
+                <div class="zen-foot-col">
+                    <div class="zen-foot-head">Get to Know Us</div>
+                    <ul class="zen-foot-list">
+                        <li><a href="#" class="zen-foot-link">About ZenStore</a></li>
+                        <li><a href="#" class="zen-foot-link">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="zen-foot-col">
+                    <div class="zen-foot-head">Connect with Us</div>
+                    <ul class="zen-foot-list">
+                        <li><a href="#" class="zen-foot-link">Instagram</a></li>
+                        <li><a href="#" class="zen-foot-link">Twitter</a></li>
+                    </ul>
+                </div>
+                <div class="zen-foot-col">
+                    <div class="zen-foot-head">Let Us Help You</div>
+                    <ul class="zen-foot-list">
+                        <li><a href="{% url 'profile' %}" class="zen-foot-link spa-link">Your Account</a></li>
+                        <li><a href="#" class="zen-foot-link">Help</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="zen-foot-bottom">
+            <a href="{% url 'home' %}" class="zen-foot-logo">Zen<span>Store</span></a>
+        </div>
+        <div class="zen-foot-copyright">© 2025 ZenStore.com</div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkBadgeVisibility();
+        });
+
+        // GLOBAL CLICK LISTENER
+        document.body.addEventListener('click', function(e) {
+            // 1. Mobile Filter Toggle
+            const mobileToggle = e.target.closest('#mobile-filter-btn');
+            if (mobileToggle) { e.preventDefault(); toggleMobileFilters(); return; }
+
+            // 2. SPA Links (Navigation)
+            const spaLink = e.target.closest('.spa-link');
+            if (spaLink) {
+                e.preventDefault();
+                loadPage(spaLink.href); // This triggers the animation
+                return;
+            }
+
+            // 3. Filter Links
+            const filterLink = e.target.closest('.ajax-filter');
+            if (filterLink) {
+                e.preventDefault();
+                handleFilterClick(filterLink);
+                return;
+            }
+
+            // 4. Cart Buttons
+            const updateBtn = e.target.closest('.update-cart');
+            if (updateBtn) {
+                e.preventDefault(); e.stopPropagation();
+                const pId = updateBtn.dataset.product; 
+                const act = updateBtn.dataset.action;
+                handleCartAction(pId, act, 1);
+                return;
+            }
+
+            // 5. Product Page Buttons
+            const addQtyBtn = e.target.closest('#add-qty-btn');
+            if (addQtyBtn) {
+                e.preventDefault(); e.stopPropagation();
+                const pId = addQtyBtn.dataset.product;
+                const qty = document.querySelector('#qty-select') ? document.querySelector('#qty-select').value : 1;
+                handleCartAction(pId, 'add', qty);
+                return;
+            }
+
+            const buyNowBtn = e.target.closest('#buy-now-btn');
+            if (buyNowBtn) {
+                e.preventDefault(); e.stopPropagation();
+                const pId = buyNowBtn.dataset.product;
+                const qty = document.querySelector('#qty-select') ? document.querySelector('#qty-select').value : 1;
+                handleCartAction(pId, 'add', qty, "{% url 'cart' %}");
+                return;
+            }
+        });
+
+        window.onpopstate = function(event) { loadPage(window.location.href); };
+
+        // --- THE ANIMATED PAGE LOADER ---
+        function loadPage(url) {
+            const container = document.getElementById('main-content');
+            
+            // 1. Add Class to trigger CSS Transition
+            container.classList.add('fade-out');
+            
+            // 2. WAIT 300ms for animation to play BEFORE fetching
+            setTimeout(() => {
+                fetch(url)
+                .then(r => r.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContent = doc.getElementById('main-content');
+                    
+                    if (newContent) {
+                        // Swap Content
+                        container.innerHTML = newContent.innerHTML;
+                        
+                        // Update URL
+                        if (window.location.href !== url) window.history.pushState({}, '', url);
+                        
+                        window.scrollTo(0,0);
+                        checkBadgeVisibility();
+                        
+                        // 3. Trigger Fade IN (Small delay to ensure DOM paint)
+                        setTimeout(() => {
+                            container.classList.remove('fade-out');
+                        }, 50);
+                    } else {
+                        window.location.href = url; // Fallback
+                    }
+                })
+                .catch(err => window.location.href = url);
+            }, 300); // Matches CSS transition time
+        }
+
+        // --- LOGIC HANDLERS (Preserved) ---
+        function handleCartAction(pId, action, qty=1, redirectUrl=null) {
+            if(user === 'AnonymousUser') { Toast.show("Please login", "error"); return; }
+            if(document.getElementById('toast-loading')) return;
+            const loadToast = Toast.show("Updating...", "loading", 0, 'toast-loading');
+
+            fetch('/update_item/', {
+                method:'POST', 
+                headers:{ 'Content-Type':'application/json', 'X-CSRFToken': getCsrfToken() },
+                body:JSON.stringify({'productId':pId, 'action':action, 'quantity':qty})
+            })
+            .then(r => r.json())
+            .then(d => { 
+                Toast.remove(loadToast);
+                if(d.status === 'success' || d.status === 'Updated') {
+                     const badge = document.getElementById('cart-badge');
+                     if(badge) { badge.innerText = d.cartTotal; badge.style.display = 'flex'; }
+                     
+                     if(redirectUrl) window.location.href = redirectUrl;
+                     else if (window.location.href.includes('cart')) loadPage(window.location.href);
+                     else Toast.show("Cart Updated!", "success");
+                } else {
+                    Toast.show(d.message || "Error", "error");
+                }
+            }).catch(e => { Toast.remove(loadToast); Toast.show("Connection Error", "error"); });
+        }
+
+        function toggleMobileFilters() {
+            const sidebar = document.querySelector('.filter-sidebar');
+            if (sidebar) sidebar.classList.toggle('show-filters');
+        }
+
+        function handleFilterClick(link) {
+            const type = link.dataset.type; const value = link.dataset.value;
+            const urlParams = new URLSearchParams(window.location.search);
+            if (type === 'category') { if(value === '') urlParams.delete('category'); else urlParams.set('category', value); } 
+            else if (type === 'price') { if(value === '') { urlParams.delete('min_price'); urlParams.delete('max_price'); } else { const [min, max] = value.split('-'); urlParams.set('min_price', min); urlParams.set('max_price', max); } } 
+            else if (type === 'rating') { if(value === '') urlParams.delete('rating'); else urlParams.set('rating', value); }
+            const newUrl = window.location.pathname + '?' + urlParams.toString();
+            window.history.pushState({}, '', newUrl);
+            
+            const loader = document.querySelector('.grid-loader');
+            const content = document.getElementById('grid-content');
+            if(loader) loader.classList.add('active'); if(content) content.style.opacity = '0.5';
+            
+            let fetchUrl = new URL(newUrl, window.location.origin);
+            fetchUrl.searchParams.append('ajax', 'true');
+            
+            fetch(fetchUrl).then(r => r.text()).then(html => {
+                if(content) { content.innerHTML = html; content.style.opacity = '1'; }
+                if(loader) loader.classList.remove('active');
+                const parentList = link.closest('ul');
+                if(parentList) { parentList.querySelectorAll('.filter-link').forEach(el => el.classList.remove('active')); if(value !== '') link.classList.add('active'); }
+                if(window.innerWidth <= 768) toggleMobileFilters();
+            });
+        }
+
+        function checkBadgeVisibility() {
+            const badge = document.getElementById('cart-badge');
+            if(!badge) return;
+            const count = parseInt(badge.innerText);
+            if(count === 0 || isNaN(count)) badge.style.display = 'none';
+            else badge.style.display = 'flex';
+        }
+
+        function toggleWishlist(productId, iconElement) {
+            if (user === 'AnonymousUser') return Toast.show("Please login", 'error');
+            const isAdd = iconElement.classList.contains('far');
+            if(isAdd) { iconElement.classList.remove('far'); iconElement.classList.add('fas', 'wishlist-active'); } 
+            else { iconElement.classList.remove('fas', 'wishlist-active'); iconElement.classList.add('far'); }
+            fetch('/toggle_wishlist/', { method:'POST', headers:{'Content-Type':'application/json', 'X-CSRFToken':getCsrfToken()}, body:JSON.stringify({'productId':productId}) });
+        }
+
+        const Toast = {
+            show: function(message, type='info', duration=3000, id=null) {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.classList.add('toast', 'toast-' + type);
+                if(id) toast.id = id;
+                let icon = type === 'success' ? 'check-circle' : (type === 'error' ? 'exclamation-circle' : 'info-circle');
+                if(type === 'loading') icon = 'spinner fa-spin';
+                toast.innerHTML = '<i class="fas fa-'+icon+'"></i> <span class="toast-content">' + message + '</span>';
+                container.appendChild(toast);
+                setTimeout(() => toast.classList.add('show'), 10);
+                if(type !== 'loading') setTimeout(() => { toast.classList.remove('show'); setTimeout(()=>toast.remove(), 400); }, duration);
+                return toast;
+            },
+            remove: function(el) { if(typeof el === 'string') el = document.getElementById(el); if(el) { el.classList.remove('show'); setTimeout(()=>el.remove(), 400); } }
+        };
+        {% if messages %} {% for message in messages %} Toast.show("{{ message }}", "{{ message.tags }}"); {% endfor %} {% endif %}
+    </script>
+</body>
+</html>

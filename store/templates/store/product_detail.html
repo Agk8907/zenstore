@@ -1,0 +1,117 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+    <div class="box-element">
+        <div class="products-layout">
+            
+            <div style="flex:1; text-align:center;">
+                <img src="{{product.imageURL}}" style="max-width:100%; max-height:400px; object-fit:contain;">
+            </div>
+            
+            <div style="flex:1.5;">
+                <h1 style="font-size: 1.5rem; line-height: 1.3;">{{product.name}}</h1>
+                <div style="color:#ffa41c; margin-bottom:10px; display:flex; align-items:center;">
+                    <i class="fas fa-star"></i> 
+                    <span style="color:#333; font-weight:bold; margin-left:5px;">{{product.average_rating|floatformat:1}}</span>
+                    <span style="color:#555; margin-left:5px;">({{product.review_count}} ratings)</span>
+                </div>
+                <hr style="border:0; border-top:1px solid #eee;">
+                <h2 style="color:#B12704; font-size:1.8rem;"><span style="font-size:1rem; vertical-align:top; color:#565959;">₹</span>{{product.price|floatformat:0}}</h2>
+
+                {% if product.stock > 10 %}
+                    <div class="badge-in" style="font-size:1.1rem; color:#007600;">In stock</div>
+                {% elif product.stock > 0 %}
+                    <div class="badge-low" style="font-size:1.1rem;">Only {{product.stock}} left in stock.</div>
+                {% else %}
+                    <div class="badge-out" style="font-size:1.1rem;">Currently Unavailable.</div>
+                {% endif %}
+                <p style="margin-top:20px; line-height:1.5;">{{product.description}}</p>
+            </div>
+            
+            <div class="buy-box-area">
+                <h3 style="color:#B12704; margin-top:0;">₹{{product.price}}</h3>
+                
+                {% if product.stock > 0 %}
+                    <div class="buy-box-container">
+                        <div class="qty-wrapper">
+                            <span class="qty-label">Quantity: <span id="qty-display">1</span></span>
+                            <i class="fas fa-chevron-down qty-arrow"></i>
+                            <select id="qty-select" class="qty-select-hidden" onchange="document.getElementById('qty-display').innerText = this.value">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                            </select>
+                        </div>
+
+                        <button id="add-qty-btn" data-product="{{product.id}}" class="amz-btn-yellow">Add to Cart</button>
+
+                        <button id="buy-now-btn" data-product="{{product.id}}" class="amz-btn-orange">Buy Now</button>
+                    </div>
+                {% else %}
+                    <button class="amz-btn-yellow amz-disabled">Out of Stock</button>
+                {% endif %}
+                
+                <div style="margin-top:15px; text-align:left;">
+                     {% if is_wishlisted %}
+                        <button style="background:none; border:none; color:#007185; cursor:pointer; text-decoration:underline;" onclick="toggleWishlist({{product.id}}, this.querySelector('i'))">
+                             <i class="fas fa-heart wishlist-active"></i> Remove from Wishlist
+                        </button>
+                    {% else %}
+                        <button style="background:none; border:none; color:#007185; cursor:pointer; text-decoration:none;" onclick="toggleWishlist({{product.id}}, this.querySelector('i'))">
+                             Add to Wishlist <i class="far fa-heart" style="display:none;"></i> 
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="box-element" style="margin-top:20px;">
+        <h2>Customer Reviews</h2>
+        {% if request.user.is_authenticated %}
+            <div class="write-review-card">
+                <h4>Write a Review</h4>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div style="margin-bottom:10px; overflow:hidden;">
+                        <div class="rate">
+                            <input type="radio" id="star5" name="rating" value="5" required /><label for="star5">5 stars</label>
+                            <input type="radio" id="star4" name="rating" value="4" /><label for="star4">4 stars</label>
+                            <input type="radio" id="star3" name="rating" value="3" /><label for="star3">3 stars</label>
+                            <input type="radio" id="star2" name="rating" value="2" /><label for="star2">2 stars</label>
+                            <input type="radio" id="star1" name="rating" value="1" /><label for="star1">1 star</label>
+                        </div>
+                    </div>
+                    <div style="clear:both;"></div>
+                    <textarea class="review-textarea" name="comment" rows="3" placeholder="Share your thoughts..." required></textarea>
+                    <button type="submit" class="btn" style="width:auto; padding:10px 20px;">Submit Review</button>
+                </form>
+            </div>
+        {% else %}
+            <p><a href="/admin/" style="color:#007185;">Log in</a> to write a review.</p>
+        {% endif %}
+        <div class="review-section">
+            {% for review in reviews %}
+            <div class="review-item">
+                <div class="review-avatar">{{review.user.email|slice:":1"|upper}}</div>
+                <div class="review-content">
+                    <div class="review-header">
+                        <span class="review-author">{{review.user.first_name|default:review.user.email}}</span>
+                        {% if has_purchased and review.user == request.user %}
+                            <span class="verified-badge">Verified Purchase</span>
+                        {% endif %}
+                    </div>
+                    <div class="review-rating-static">{% if review.rating == 5 %}⭐⭐⭐⭐⭐{% elif review.rating == 4 %}⭐⭐⭐⭐{% elif review.rating == 3 %}⭐⭐⭐{% elif review.rating == 2 %}⭐⭐{% else %}⭐{% endif %}</div>
+                    <p style="margin:5px 0;">{{review.comment}}</p>
+                    <div class="review-date">Reviewed on {{review.created_at|date:"F d, Y"}}</div>
+                </div>
+            </div>
+            {% empty %}
+            <p style="margin-top:20px; color:#666;">No reviews yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

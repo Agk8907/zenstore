@@ -1,0 +1,31 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+<div style="display: flex; justify-content: center;">
+    <div class="box-element" style="max-width: 700px;">
+        <div style="border-bottom:1px solid #eee; margin-bottom:20px;">
+            <h2 style="color:#C7511F;">1. Enter a shipping address</h2>
+        </div>
+
+        <form method="POST" action="">
+            {% csrf_token %}
+            <div style="display:flex; gap:20px; margin-bottom:15px;">
+                <div style="flex:1;"><label class="form-label">First Name</label><input class="form-input" name="first_name" value="{{request.user.first_name}}" required></div>
+                <div style="flex:1;"><label class="form-label">Last Name</label><input class="form-input" name="last_name" value="{{request.user.last_name}}" required></div>
+            </div>
+            <label class="form-label">Phone</label><input class="form-input" name="phone" value="{{request.user.phone_number|default:''}}" required>
+            <br><br>
+            <label class="form-label">Address</label><input class="form-input" name="address" value="{{request.user.address|default:''}}" required placeholder="Street address...">
+            <br><br>
+            <div style="display:flex; gap:20px; margin-bottom:15px;">
+                <div style="flex:1;"><label class="form-label">City</label><input class="form-input" name="city" value="{{request.user.city|default:''}}" required></div>
+                <div style="flex:1;"><label class="form-label">Zipcode</label><input class="form-input" name="zipcode" value="{{request.user.zipcode|default:''}}" required></div>
+            </div>
+            
+            <div style="margin-top:30px;">
+                <button type="submit" class="btn" style="width:100%; max-width:300px;">Use this Address & Continue</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

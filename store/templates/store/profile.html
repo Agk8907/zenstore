@@ -1,0 +1,47 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+    <div class="profile-container">
+        <div class="profile-header-card">
+            <div class="profile-info-group">
+                <div class="profile-pic-large">{{request.user.email|slice:":1"|upper}}</div>
+                <div>
+                    <h2 style="margin:0;">{{request.user.first_name}} {{request.user.last_name}}</h2>
+                    <p style="margin:0; color:#555;">{{request.user.email}}</p>
+                </div>
+            </div>
+            <a href="{% url 'logout' %}" class="btn" style="background:#eee; color:#333; border:1px solid #ccc; width:150px; text-decoration:none;">Log Out</a>
+        </div>
+        <div class="box-element">
+            <h2 style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-top:0;">Edit Details</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div style="display:flex; gap:20px; margin-bottom:15px; flex-wrap:wrap;">
+                    <div style="flex:1;"><label class="form-label">First Name</label><input class="form-input" name="first_name" value="{{request.user.first_name}}"></div>
+                    <div style="flex:1;"><label class="form-label">Last Name</label><input class="form-input" name="last_name" value="{{request.user.last_name}}"></div>
+                </div>
+                <label class="form-label">Phone</label><input class="form-input" name="phone_number" value="{{request.user.phone_number|default:''}}">
+                <br><br>
+                <label class="form-label">Address</label><input class="form-input" name="address" value="{{request.user.address|default:''}}">
+                <br><br>
+                <div style="display:flex; gap:20px; margin-bottom:15px; flex-wrap:wrap;">
+                    <div style="flex:1;"><label class="form-label">City</label><input class="form-input" name="city" value="{{request.user.city|default:''}}"></div>
+                    <div style="flex:1;"><label class="form-label">Zip</label><input class="form-input" name="zipcode" value="{{request.user.zipcode|default:''}}"></div>
+                </div>
+                <button type="submit" class="save-btn">Save Changes</button>
+            </form>
+        </div>
+        <div class="box-element">
+            <h2 style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-top:0;">Your Orders</h2>
+            {% for order in orders %}
+            <div class="order-item">
+                <div><strong>Order #{{order.id}}</strong><br><span style="font-size:0.9rem; color:#666;">{{order.date_ordered|date:"M d, Y"}}</span></div>
+                <div><strong>₹{{order.get_cart_total}}</strong></div>
+                <div class="status-tag">Delivered</div>
+            </div>
+            {% empty %}
+            <p>No completed orders yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

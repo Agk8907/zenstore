@@ -1,0 +1,58 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+    <div class="products-layout">
+        
+        <button id="mobile-filter-btn">
+            <span><i class="fas fa-filter"></i> Filter Products</span>
+            <i class="fas fa-chevron-down" id="filter-arrow"></i>
+        </button>
+
+        <div class="filter-sidebar">
+            <h3>Filters</h3>
+            <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
+            
+            <div class="filter-section">
+                <div class="filter-title">Category</div>
+                <ul class="filter-list">
+                    <li><a href="javascript:void(0)" data-type="category" data-value="" class="filter-link ajax-filter {% if not active_category %}active{% endif %}">All Products</a></li>
+                    {% for cat in categories %}
+                    <li><a href="javascript:void(0)" data-type="category" data-value="{{cat.id}}" class="filter-link ajax-filter {% if active_category == cat.id|stringformat:'s' %}active{% endif %}">{{cat.name}}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-title">Price</div>
+                <ul class="filter-list">
+                    <li><a href="javascript:void(0)" data-type="price" data-value="0-300" class="filter-link ajax-filter {% if active_max == '300' %}active{% endif %}">Under ₹300</a></li>
+                    <li><a href="javascript:void(0)" data-type="price" data-value="300-500" class="filter-link ajax-filter {% if active_min == '300' %}active{% endif %}">₹300 - ₹500</a></li>
+                    <li><a href="javascript:void(0)" data-type="price" data-value="500-1000" class="filter-link ajax-filter {% if active_min == '500' %}active{% endif %}">₹500 - ₹1,000</a></li>
+                    <li><a href="javascript:void(0)" data-type="price" data-value="1000-1500" class="filter-link ajax-filter {% if active_min == '1000' %}active{% endif %}">₹1,000 - ₹1,500</a></li>
+                    <li><a href="javascript:void(0)" data-type="price" data-value="1500-100000" class="filter-link ajax-filter {% if active_min == '1500' %}active{% endif %}">Over ₹1,500</a></li>
+                    <li id="clear-price-btn" style="display: {% if active_min or active_max %}block{% else %}none{% endif %}; margin-top:5px;">
+                        <a href="javascript:void(0)" data-type="price" data-value="" class="clear-filter ajax-filter"><i class="fas fa-times"></i> Clear Price</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-title">Avg. Customer Review</div>
+                <ul class="filter-list">
+                    <li><a href="javascript:void(0)" data-type="rating" data-value="4" class="filter-link ajax-filter {% if active_rating == '4' %}active{% endif %}"><i class="fas fa-star sidebar-star"></i><i class="fas fa-star sidebar-star"></i><i class="fas fa-star sidebar-star"></i><i class="fas fa-star sidebar-star"></i><i class="far fa-star sidebar-star-empty"></i> <span class="rating-text">& Up</span></a></li>
+                    <li><a href="javascript:void(0)" data-type="rating" data-value="3" class="filter-link ajax-filter {% if active_rating == '3' %}active{% endif %}"><i class="fas fa-star sidebar-star"></i><i class="fas fa-star sidebar-star"></i><i class="fas fa-star sidebar-star"></i><i class="far fa-star sidebar-star-empty"></i><i class="far fa-star sidebar-star-empty"></i> <span class="rating-text">& Up</span></a></li>
+                    <li id="clear-rating-btn" style="display: {% if active_rating %}block{% else %}none{% endif %}; margin-top:5px;">
+                        <a href="javascript:void(0)" data-type="rating" data-value="" class="clear-filter ajax-filter"><i class="fas fa-times"></i> Clear Rating</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="products-grid-area" id="product-grid-container">
+            <div class="grid-loader"><div class="spinner"></div></div>
+            <div id="grid-content">
+                {% include 'store/product_list_partial.html' %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}

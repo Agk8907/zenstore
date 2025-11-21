@@ -1,0 +1,29 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+    <div class="box-element">
+        <h2>My Wishlist</h2>
+        <div class="row" style="justify-content: flex-start;">
+            {% for product in products %}
+            <div class="product-card">
+                <i class="fas fa-heart wishlist-icon wishlist-active" onclick="toggleWishlist({{product.id}}, this)"></i>
+                
+                <a href="{% url 'product_detail' product.id %}" class="spa-link" style="text-decoration:none; color:inherit;">
+                    <img class="product-image" src="{{product.imageURL}}">
+                    <div class="product-body">
+                        <h6 class="product-title">{{product.name}}</h6>
+                        <h4 class="product-price">₹{{product.price}}</h4>
+                    </div>
+                </a>
+                {% if product.stock > 0 %}
+                    <button data-product="{{product.id}}" data-action="add" class="btn update-cart">Add to Cart</button>
+                {% else %}
+                    <button class="btn btn-disabled">Out of Stock</button>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p>Your wishlist is empty.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

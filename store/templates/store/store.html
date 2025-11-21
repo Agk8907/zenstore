@@ -1,0 +1,22 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+    <div class="row">
+        {% for product in products %}
+        <div class="product-card">
+            <a href="{% url 'product_detail' product.id %}" style="text-decoration:none; color:inherit;">
+                <img class="product-image" src="{{product.imageURL}}">
+                <div class="product-body">
+                    <h6 class="product-title">{{product.name}}</h6>
+                    <div class="rating">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
+                        <span style="color:#007185; font-size:0.8rem;">(124)</span>
+                    </div>
+                    <h4 class="product-price"><span>₹</span>{{product.price|floatformat:0}}<span>{{product.price|stringformat:".2f"|slice:"-3:"}}</span></h4>
+                </div>
+            </a>
+            <button data-product="{{product.id}}" data-action="add" class="btn update-cart">Add to Cart</button>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock content %}

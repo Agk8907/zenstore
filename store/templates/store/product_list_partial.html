@@ -1,0 +1,45 @@
+{% load static %}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <h2>
+        {% if active_category %}Results{% else %}All Products{% endif %}
+        {% if active_rating %} <span style="font-size:1rem; font-weight:normal; color:#555;">({{active_rating}}+ Stars)</span>{% endif %}
+        {% if active_min %} <span style="font-size:1rem; font-weight:normal; color:#555;">(₹{{active_min}} - ₹{{active_max}})</span>{% endif %}
+    </h2>
+</div>
+
+<div class="row" style="justify-content: flex-start;">
+    {% for product in products %}
+    <div class="product-card">
+        {% if product.is_wishlisted %}
+            <i class="fas fa-heart wishlist-icon wishlist-active" onclick="toggleWishlist({{product.id}}, this)"></i>
+        {% else %}
+            <i class="far fa-heart wishlist-icon" onclick="toggleWishlist({{product.id}}, this)"></i>
+        {% endif %}
+
+        <a href="{% url 'product_detail' product.id %}" class="spa-link" style="text-decoration:none; color:inherit;">
+            <img class="product-image" src="{{product.imageURL}}">
+            <div class="product-body">
+                <h6 class="product-title">{{product.name}}</h6>
+                <div style="margin-bottom:5px;">
+                    <span style="color:#ffa41c; font-size:0.8rem;">
+                        <i class="fas fa-star"></i> {{product.average_rating|floatformat:1}}
+                    </span>
+                    <span style="color:#ccc; font-size:0.8rem;">({{product.review_count}})</span>
+                </div>
+                <h4 class="product-price">₹{{product.price}}</h4>
+            </div>
+        </a>
+        
+        {% if product.stock > 0 %}
+            <button data-product="{{product.id}}" data-action="add" class="btn update-cart">Add to Cart</button>
+        {% else %}
+            <button class="btn btn-disabled">Out of Stock</button>
+        {% endif %}
+    </div>
+    {% empty %}
+    <div style="width:100%; padding:50px; text-align:center;">
+        <h3>No products match your filters.</h3>
+        <button onclick="window.location.href='{% url 'products' %}'" class="btn" style="width:200px; margin-top:10px;">Clear Filters</button>
+    </div>
+    {% endfor %}
+</div>

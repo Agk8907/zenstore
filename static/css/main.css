@@ -1,0 +1,1695 @@
+:root {
+    --amazon-dark: #131921;
+    --amazon-light: #232f3e;
+    --amazon-orange: #febd69;
+    --amazon-blue: #007185;
+    --bg-color: #eaeded;
+    --white: #ffffff;
+    --text-main: #0F1111;
+    --border-col: #ddd;
+}
+
+body {
+    background-color: var(--bg-color);
+    font-family: "Amazon Ember", Arial, sans-serif;
+    margin: 0;
+    color: var(--text-main);
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- LAYOUT UTILS --- */
+#main-content {
+    flex: 1;
+    transition: opacity 0.3s ease;
+    width: 100%;
+}
+
+.container {
+    max-width: 1500px;
+    width: 96%;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+.fade-out { opacity: 0 !important; }
+
+/* --- NAVBAR --- */
+header { background-color: var(--amazon-dark); padding: 10px 0; position: sticky; top:0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+.navbar-top { display: flex; align-items: center; justify-content: space-between; max-width: 1500px; width: 96%; margin: 0 auto; }
+.brand-logo { font-size: 1.8rem; font-weight: bold; color: white; text-decoration: none; }
+.brand-logo span { color: var(--amazon-orange); }
+.nav-options { display: flex; align-items: center; gap: 25px; }
+.nav-link { color: white; text-decoration: none; font-weight: 600; position: relative; cursor: pointer; }
+.nav-link:hover { color: var(--amazon-orange); }
+.account-btn { width: 40px; height: 40px; background: white; color: var(--amazon-dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; text-decoration: none; border: 2px solid var(--amazon-orange); transition: transform 0.2s; }
+.account-btn:hover { transform: scale(1.1); background: var(--amazon-orange); color: white; }
+
+/* --- CART BADGE --- */
+.cart-nav-item { position: relative; display: flex; align-items: center; }
+.cart-badge { position: absolute; top: -8px; right: -12px; background: #d35400; color: white; border-radius: 50%; min-width: 20px; height: 20px; padding:0 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10; transition: transform 0.2s; }
+.badge-pop { animation: pop-anim 0.3s ease; }
+@keyframes pop-anim { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
+.cart-badge:empty, .cart-badge[data-count="0"] { display: none; }
+
+/* --- GLOBAL COMPONENTS --- */
+.box-element { background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 30px; margin-bottom: 20px; width: 100%; box-sizing: border-box; }
+.btn { background: #ffd814; border: 1px solid #fcd200; padding: 8px; width: 100%; border-radius: 20px; cursor: pointer; font-weight: 600; transition: background 0.2s; text-align:center; display:inline-block; text-decoration:none; color:black;}
+.btn:hover { background: #f7ca00; }
+.btn-disabled { background: #eee; border: 1px solid #ddd; color: #999; cursor: not-allowed; }
+
+/* --- TOAST NOTIFICATIONS --- */
+#toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+.toast { min-width: 300px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 15px; transform: translateX(120%); transition: transform 0.4s; border-left: 5px solid #ccc; }
+.toast.show { transform: translateX(0); }
+.toast-success { border-left-color: #2ecc71; } .toast-success i { color: #2ecc71; }
+.toast-error { border-left-color: #e74c3c; } .toast-error i { color: #e74c3c; }
+.toast-loading { border-left-color: #f1c40f; }
+.loader { border: 3px solid #f3f3f3; border-top: 3px solid #f1c40f; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* --- AUTH PAGES (Glassmorphism) --- */
+.auth-container { display: flex; justify-content: center; align-items: center; min-height: 80vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: -20px; padding: 20px; }
+.auth-card { background: rgba(255, 255, 255, 0.9); padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); text-align: center; position: relative; max-width: 400px; width: 100%; }
+.auth-title { font-size: 2rem; margin-bottom: 5px; background: -webkit-linear-gradient(#667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+.auth-input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; margin-bottom: 15px; box-sizing: border-box; }
+.auth-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
+
+/* --- HOME & CATEGORIES --- */
+.hero-banner { background: linear-gradient(to right, #232f3e, #131921); color: white; padding: 60px 20px; text-align: center; margin-bottom: 30px; border-radius: 4px; }
+.category-grid { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; }
+.category-card { background: white; width: 250px; padding: 20px; text-align: center; border-radius: 8px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: transform 0.3s; }
+.category-card:hover { transform: translateY(-5px); }
+.cat-img { width: 100%; height: 150px; object-fit: cover; margin-bottom: 15px; background: #eee; border-radius: 4px;}
+
+/* --- PRODUCT LIST & FILTERS (Rich Sidebar) --- */
+.products-layout { display: flex; gap: 30px; align-items: flex-start; }
+.filter-sidebar { width: 260px; min-width: 260px; background: white; padding: 20px; border-radius: 8px; position: sticky; top: 80px; height: fit-content; border-right: 1px solid #e7e7e7; }
+.filter-sidebar h3 { margin-top: 0; font-size: 1.1rem; text-transform: uppercase; }
+.filter-section { margin-bottom: 25px; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; }
+.filter-title { font-weight: 700; margin-bottom: 10px; display: block; font-size: 0.9rem; }
+.filter-list { list-style: none; padding: 0; margin: 0; }
+.filter-link { display: block; padding: 6px 8px; color: #444; text-decoration: none; border-radius: 4px; transition: all 0.2s; font-size: 0.9rem; }
+.filter-link:hover { background: #f3f4f6; color: #C7511F; transform: translateX(3px); }
+.filter-link.active { background: #fff5e8; color: #B12704; font-weight: 700; border-left: 3px solid #B12704; }
+.sidebar-star { color: #FFA41C; margin-right: 2px; }
+.products-grid-area { flex: 1; position: relative; min-height: 300px; }
+.grid-loader { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); z-index: 10; display: none; justify-content: center; padding-top: 100px; }
+.grid-loader.active { display: flex; }
+.spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #ffa41c; border-radius: 50%; animation: spin 0.8s linear infinite; }
+
+/* --- PRODUCT CARDS --- */
+.row { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; }
+.product-card { background: white; width: 260px; padding: 20px; border-radius: 8px; border: 1px solid #ddd; display: flex; flex-direction: column; transition: transform 0.2s; position: relative; }
+.product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+.product-image { width: 100%; height: 200px; object-fit: contain; margin-bottom: 10px;}
+.product-title { font-size: 1.1rem; margin: 5px 0; height: 45px; overflow: hidden; }
+.product-price { font-size: 1.3rem; font-weight: bold; margin: 5px 0; }
+.wishlist-icon { position: absolute; top: 15px; right: 15px; font-size: 1.5rem; color: #ccc; cursor: pointer; background: rgba(255,255,255,0.8); padding: 5px; border-radius: 50%; }
+.wishlist-active { color: #e74c3c !important; }
+
+/* --- PRODUCT DETAIL (Amazon Style Buttons) --- */
+.buy-box-container { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 300px; margin: 0 auto; }
+.qty-wrapper { background: #F0F2F2; border: 1px solid #D5D9D9; border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; position: relative; }
+.qty-select-hidden { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.amz-btn-yellow { background: #FFD814; border: 1px solid #FCD200; border-radius: 100px; padding: 10px; width: 100%; cursor: pointer; font-weight: 500; }
+.amz-btn-yellow:hover { background: #F7CA00; }
+.amz-btn-orange { background: #FFA41C; border: 1px solid #FF8F00; border-radius: 100px; padding: 10px; width: 100%; cursor: pointer; font-weight: 500; }
+.amz-btn-orange:hover { background: #FA8900; }
+.badge-in { color: #007600; font-weight: bold; } .badge-out { color: #c0392b; }
+
+/* --- CHECKOUT & SAVED ADDRESS --- */
+.saved-address-card { background: #fcfcfc; border: 2px solid #e7e7e7; border-radius: 8px; padding: 20px; margin-bottom: 15px; }
+.saved-address-card.selected { border-color: #ffa41c; background: #fffcf5; }
+.form-label { display: block; margin-bottom: 5px; font-weight: bold; }
+.form-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+
+/* --- PROFILE (Stacked) --- */
+.profile-container { display: flex; flex-direction: column; gap: 20px; max-width: 1000px; margin: 0 auto; }
+.profile-header-card { background: white; border-radius: 8px; padding: 20px 40px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.profile-pic-large { width: 80px; height: 80px; background: var(--amazon-light); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; flex-shrink: 0; }
+.order-item { border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 4px; background: #fcfcfc; display: flex; justify-content: space-between; align-items: center; }
+
+/* --- REVIEWS (Interactive) --- */
+.rate { height: 46px; padding: 0 10px 0 0; display: flex; flex-direction: row-reverse; justify-content: flex-end; }
+.rate:not(:checked) > input { position: absolute; top: -9999px; }
+.rate:not(:checked) > label { float: right; width: 1em; overflow: hidden; white-space: nowrap; cursor: pointer; font-size: 30px; color: #ccc; }
+.rate:not(:checked) > label:before { content: '★ '; }
+.rate > input:checked ~ label { color: #ffc700; }
+.review-textarea { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; }
+
+/* =========================================
+   FOOTER STYLES (THE MISSING PART)
+   ========================================= */
+.zen-footer { font-family: "Amazon Ember", Arial, sans-serif; color: #DDD; margin-top: auto; width: 100%; }
+.zen-foot-top-btn { background-color: #37475A; color: white; text-align: center; padding: 15px 0; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.zen-foot-top-btn:hover { background-color: #485769; }
+.zen-foot-main { background-color: #232F3E; border-bottom: 1px solid #3a4553; padding: 40px 0; }
+.zen-foot-container { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-around; align-items: flex-start; }
+.zen-foot-col { min-width: 180px; }
+.zen-foot-head { color: white; font-size: 1rem; font-weight: 700; margin-bottom: 14px; }
+.zen-foot-list { list-style: none; padding: 0; margin: 0; }
+.zen-foot-list li { margin-bottom: 8px; }
+.zen-foot-link { color: #DDD; text-decoration: none; font-size: 0.85rem; font-family: Arial, sans-serif; }
+.zen-foot-link:hover { text-decoration: underline; }
+.zen-foot-bottom { background-color: #232F3E; padding: 30px 0; border-top: 1px solid #3a4553; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.zen-foot-logo { font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none; }
+.zen-foot-logo span { color: #febd69; }
+.zen-foot-settings { display: flex; gap: 10px; align-items: center; }
+.zen-foot-btn { background: transparent; border: 1px solid #848688; color: #ccc; padding: 6px 18px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
+.zen-foot-copyright { background-color: #131A22; color: #999; font-size: 0.75rem; text-align: center; padding: 20px 0; }
+
+/* =========================================
+   MOBILE RESPONSIVE
+   ========================================= */
+@media only screen and (max-width: 768px) {
+    .navbar-top { flex-direction: column; gap: 10px; padding: 10px 0; }
+    .nav-options { width: 100%; justify-content: space-around; }
+    .products-layout { flex-direction: column; }
+    .filter-sidebar { width: 100%; position: relative; top: 0; margin-bottom: 20px; }
+    .box-element .products-layout { flex-direction: column; }
+    .zen-foot-container { flex-wrap: wrap; justify-content: flex-start; padding: 0 20px; gap: 30px; }
+    .zen-foot-col { width: 45%; margin-bottom: 10px; }
+}
+
+
+
+/* ======================================================
+   ZENSTORE FOOTER STYLES
+   ====================================================== */
+/* Ensure footer is outside main container flow */
+.container {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.zen-footer {
+    background-color: #232F3E; /* Dark Theme */
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    margin-top: 50px;
+    width: 100%;
+    display: block;
+    clear: both;
+}
+
+/* Back to Top */
+.zen-foot-top-btn {
+    background-color: #37475A;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.zen-foot-top-btn:hover { background-color: #485769; }
+
+/* Main Links Area */
+.zen-foot-main {
+    background-color: #232F3E;
+    padding: 40px 0;
+    border-bottom: 1px solid #3a4553;
+}
+
+.zen-foot-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around; /* Evenly spaced columns */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    padding: 0 20px;
+}
+
+.zen-foot-col {
+    min-width: 150px;
+    margin-bottom: 20px;
+}
+
+.zen-foot-head {
+    font-weight: bold;
+    font-size: 16px;
+    color: white;
+    margin-bottom: 12px;
+}
+
+.zen-foot-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.zen-foot-list li {
+    margin-bottom: 8px;
+}
+
+.zen-foot-link {
+    color: #DDD;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.zen-foot-link:hover { text-decoration: underline; color: #febd69; }
+
+/* Bottom Bar */
+.zen-foot-bottom {
+    background-color: #232F3E;
+    padding: 30px;
+    text-align: center;
+}
+
+.zen-foot-logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+    margin-bottom: 15px;
+    display: inline-block;
+}
+.zen-foot-logo span { color: #febd69; }
+
+.zen-foot-copyright {
+    background-color: #131A22; /* Darker shade for bottom-most bar */
+    padding: 15px;
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS FOR FOOTER
+   ========================================= */
+@media only screen and (max-width: 768px) {
+    .zen-foot-container {
+        justify-content: flex-start; /* Left-align on mobile */
+        padding: 0 20px;
+    }
+    
+    .zen-foot-col {
+        width: 45%; /* Two columns per row */
+        margin-right: 5%;
+        margin-bottom: 30px;
+    }
+
+    .zen-foot-head {
+        font-size: 15px;
+    }
+    
+    .zen-foot-bottom {
+        padding: 20px 10px;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+     .zen-foot-col {
+        width: 100%; /* One column per row on very small screens */
+        margin-right: 0;
+        text-align: center;
+    }
+     .zen-foot-head { text-align: center; }
+}
+/* =========================================
+   PROFESSIONAL PAYMENT MODAL STYLES
+   ========================================= */
+
+/* 1. The Dark Overlay */
+.payment-modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.75); /* Darker background */
+    backdrop-filter: blur(5px);       /* Blur effect behind modal */
+    z-index: 9999;
+    display: none;                    /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Active State for JS to toggle */
+.payment-modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+/* 2. The Modal Card */
+.payment-modal {
+    background: #ffffff;
+    width: 100%;
+    max-width: 420px; /* Optimal width for credit card forms */
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    transform: translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.payment-modal-overlay.active .payment-modal {
+    transform: translateY(0);
+}
+
+/* 3. Secure Header */
+.payment-header {
+    background: #1f2937; /* Professional Dark Grey/Blue */
+    color: #ffffff;
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #374151;
+}
+
+.payment-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+}
+
+.secure-icon { color: #10b981; /* Green lock icon */ }
+
+.close-modal {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #9ca3af;
+    transition: color 0.2s;
+    line-height: 1;
+}
+.close-modal:hover { color: #ffffff; }
+
+/* 4. Modal Body & Inputs */
+.payment-body {
+    padding: 30px 25px;
+}
+
+.card-input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.card-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #1f2937;
+    background-color: #f9fafb;
+    transition: all 0.2s ease;
+    box-sizing: border-box; /* Fixes width issues */
+    font-family: 'Courier New', monospace; /* Monospace for card numbers */
+    font-weight: 600;
+}
+
+.card-input:focus {
+    border-color: #3b82f6; /* Focus Blue */
+    background-color: #ffffff;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.card-input::placeholder { color: #9ca3af; font-weight: 400; font-family: Arial, sans-serif; }
+
+/* Flex Row for Expiry & CVV */
+.card-row {
+    display: flex;
+    gap: 20px;
+}
+
+.card-row .card-input-group {
+    flex: 1; /* Equal width */
+}
+
+/* 5. Pay Button */
+.pay-now-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%); /* Green Gradient */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+    margin-top: 10px;
+}
+
+.pay-now-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4);
+}
+
+.pay-now-btn:active {
+    transform: translateY(0);
+}
+
+.pay-now-btn:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* =========================================
+   MOBILE ADJUSTMENTS
+   ========================================= */
+@media only screen and (max-width: 480px) {
+    .payment-modal {
+        width: 100%;
+        border-radius: 12px 12px 0 0; /* Rounded top only */
+        position: fixed;
+        bottom: 0;
+        transform: translateY(100%);
+        max-width: none; /* Full width on mobile */
+        margin: 0;
+    }
+    
+    .payment-modal-overlay {
+        align-items: flex-end; /* Stick to bottom on mobile */
+        padding: 0;
+    }
+    
+    .payment-modal-overlay.active .payment-modal {
+        transform: translateY(0);
+    }
+    
+    .payment-body {
+        padding: 25px 20px 40px 20px; /* Extra padding at bottom for safe area */
+    }
+}
+
+/* =========================================
+   PAYMENT MODAL (Force Applied)
+   ========================================= */
+
+/* The Dark Overlay Background */
+.payment-modal-overlay {
+    position: fixed !important; /* Force it out of document flow */
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.8) !important;
+    backdrop-filter: blur(8px);
+    z-index: 99999 !important; /* Sit on top of everything */
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Show state */
+.payment-modal-overlay.active {
+    display: flex !important;
+    opacity: 1;
+}
+
+/* The Card Itself */
+.payment-modal {
+    background: #fff;
+    width: 100%;
+    max-width: 450px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.payment-modal-overlay.active .payment-modal {
+    transform: scale(1);
+}
+
+/* Header */
+.payment-header {
+    background: #1f2937;
+    color: #fff;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.payment-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.close-modal {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #9ca3af;
+    line-height: 1;
+}
+.close-modal:hover { color: #fff; }
+
+/* Body */
+.payment-body {
+    padding: 25px;
+}
+
+.card-input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.card-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #4b5563;
+    margin-bottom: 8px;
+}
+
+.card-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-family: monospace;
+    background: #f9fafb;
+    box-sizing: border-box;
+}
+
+.card-input:focus {
+    border-color: #10b981;
+    background: #fff;
+    outline: none;
+}
+
+.card-row {
+    display: flex;
+    gap: 15px;
+}
+
+.pay-now-btn {
+    width: 100%;
+    padding: 15px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s;
+}
+.pay-now-btn:hover { background: #059669; }
+
+/* Mobile Specifics */
+@media only screen and (max-width: 480px) {
+    .payment-modal {
+        position: absolute;
+        bottom: 0;
+        border-radius: 16px 16px 0 0;
+        max-width: 100%;
+        margin: 0;
+        transform: translateY(100%);
+    }
+    
+    .payment-modal-overlay.active .payment-modal {
+        transform: translateY(0);
+    }
+    
+    .payment-body {
+        padding-bottom: 40px; /* Safe area */
+    }
+}
+
+
+/* =========================================
+   FINAL MOBILE LAYOUT & OVERFLOW FIXES
+   ========================================= */
+
+/* 1. Prevent Horizontal Scroll */
+html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+@media only screen and (max-width: 768px) {
+    
+    /* 2. Fix Main Container */
+    .container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 15px !important; /* Breathing room */
+        box-sizing: border-box !important;
+        margin: 0 auto !important;
+    }
+
+    /* 3. Navbar Fix */
+    .navbar-top {
+        width: 100% !important;
+        padding: 10px 15px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 4. Filter Sidebar: HIDDEN BY DEFAULT */
+    .filter-sidebar {
+        display: none !important; /* Force hide */
+        width: 100% !important;
+        border-right: none !important;
+        border: 1px solid #eee;
+        margin-bottom: 20px;
+        position: relative; /* Not sticky on mobile */
+        top: 0;
+    }
+
+    /* Only show when class 'show-filters' is added via JS */
+    .filter-sidebar.show-filters {
+        display: block !important;
+    }
+
+    /* 5. Product Grid Alignment */
+    .products-grid-area {
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .row {
+        margin: 0 !important;
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    /* 6. Product Cards */
+    .product-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 0 20px 0 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+    }
+
+    /* 7. Footer Stacking */
+    .zen-footer {
+        width: 100% !important;
+        overflow-x: hidden !important;
+    }
+    
+    .zen-foot-container {
+        flex-direction: column !important;
+        align-items: center !important;
+        padding: 0 20px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .zen-foot-col {
+        width: 100% !important;
+        text-align: center !important;
+        margin-bottom: 30px !important;
+    }
+
+    /* 8. Cart & Box Elements */
+    .box-element {
+        width: 100% !important;
+        margin: 10px 0 !important;
+        padding: 15px !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important; /* Contains inner elements */
+    }
+}
+
+
+/* =========================================
+   FIX: MOBILE CART CUTOFF (Table -> Cards)
+   ========================================= */
+@media only screen and (max-width: 768px) {
+    
+    /* 1. Force Table Elements to behave like Blocks */
+    .box-element table, 
+    .box-element tbody, 
+    .box-element tr, 
+    .box-element td { 
+        display: block !important; 
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 2. Hide the Header Row (Item, Price, Qty...) completely */
+    .box-element table tr:first-child { 
+        display: none !important;
+    }
+
+    /* 3. Style each Cart Item as a "Card" */
+    .box-element table tr { 
+        border: 1px solid #e7e7e7; 
+        border-radius: 12px;
+        margin-bottom: 15px; 
+        padding: 15px;
+        background: #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        display: flex !important;
+        flex-direction: column;
+    }
+
+    /* 4. Image & Name Section (Top of Card) */
+    .box-element td:nth-child(1) {
+        display: flex !important;
+        align-items: center;
+        border-bottom: 1px solid #f0f0f0 !important;
+        padding-bottom: 15px !important;
+        margin-bottom: 10px;
+        text-align: left;
+        width: 100%;
+    }
+    
+    .box-element td:nth-child(1) img {
+        width: 80px !important;
+        height: 80px !important;
+        object-fit: contain;
+        margin-right: 15px !important;
+        border-radius: 4px;
+        border: 1px solid #eee;
+        padding: 5px;
+    }
+
+    /* 5. Data Rows (Price, Qty, Total) - Flex Layout */
+    .box-element td {
+        display: flex !important;
+        justify-content: space-between; /* Label Left, Value Right */
+        align-items: center;
+        padding: 8px 0 !important;
+        border: none !important;
+        font-size: 0.95rem;
+    }
+
+    /* Add Labels so user knows what the numbers are */
+    .box-element td:nth-child(2)::before { content: "Price"; color: #666; font-weight: 600; }
+    .box-element td:nth-child(3)::before { content: "Quantity"; color: #666; font-weight: 600; }
+    .box-element td:nth-child(4)::before { content: "Total"; color: #333; font-weight: 700; }
+
+    /* 6. Highlight Total */
+    .box-element td:nth-child(4) {
+        border-top: 1px dashed #eee !important;
+        margin-top: 5px;
+        padding-top: 10px !important;
+        color: #B12704;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    /* 7. Fix Buttons Container */
+    .box-element td:nth-child(3) > div {
+        margin-left: auto; /* Push buttons to right */
+    }
+}
+
+
+/* =========================================
+   FIX: MOBILE PRODUCT DETAIL WIDTH (UN-COMPRESS)
+   ========================================= */
+@media only screen and (max-width: 768px) {
+    
+    /* 1. Target ALL sections inside the product layout (Image, Info, Buy Box) */
+    .products-layout > div {
+        flex: none !important;       /* Disable desktop flex sizing */
+        width: 100% !important;      /* Force full width */
+        max-width: 100% !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 2. Specific tweaks for the Info Section (Middle Div) */
+    /* This is usually the 2nd div, containing Title, Price, etc. */
+    .products-layout > div:nth-child(2) {
+        padding: 0 5px !important;   /* Add slight padding so text doesn't touch edges */
+        text-align: left !important; /* Ensure text aligns naturally */
+        margin-bottom: 20px !important;
+    }
+
+    /* 3. Ensure the Buy Box (buttons) also fills width */
+    .buy-box-area {
+        width: 100% !important;
+        min-width: 100% !important;
+        margin-top: 10px !important;
+    }
+
+    /* 4. Fix Button Widths inside the Buy Box */
+    .buy-box-container {
+        max-width: 100% !important; /* Allow buttons to stretch full screen */
+        width: 100% !important;
+    }
+
+    .amz-btn-yellow, .amz-btn-orange {
+        width: 100% !important;
+    }
+}
+
+
+/* =========================================
+   BRANDING & MOBILE ICONS CSS
+   ========================================= */
+
+/* 1. Main Brand Icon (Lotus) - Visible everywhere */
+.brand-main-icon {
+    color: #febd69; /* Amazon yellow/orange accent color */
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+
+/* Ensure brand logo is aligned nicely */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+/* 2. Navigation Item Icons (Home, Products, etc.) */
+/* HIDE by default on Desktop to keep it clean */
+.mobile-nav-icon {
+    display: none;
+}
+
+/* 3. Mobile Specific Styling */
+@media only screen and (max-width: 992px) {
+    /* On mobile/tablet, SHOW the icons in the menu */
+    .mobile-nav-icon {
+        display: inline-block !important;
+        margin-right: 12px;
+        width: 20px; /* Fixed width for perfect alignment */
+        text-align: center;
+        color: #febd69; /* Accent color */
+    }
+
+    /* Make menu items taller and perfectly aligned on mobile */
+    .navbar-nav .nav-link {
+        display: flex !important;
+        align-items: center !important;
+        padding: 12px 15px !important;
+        border-bottom: 1px solid #374151; /* Subtle separator in dark mode */
+        font-size: 1.05rem;
+    }
+    
+    /* Remove border from last item */
+    .navbar-nav .nav-item:last-child .nav-link {
+        border-bottom: none;
+    }
+}
+
+
+/* =========================================
+   PREMIUM NAVBAR DESIGN (Hover & Glow)
+   ========================================= */
+
+/* 1. The Header Container (Gradient Background) */
+header {
+    background: linear-gradient(90deg, #131921 0%, #232f3e 100%) !important;
+    padding: 12px 0 !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.navbar-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 2. Brand Logo (Glow Effect) */
+.brand-logo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #fff !important;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.brand-logo span {
+    color: #febd69;
+    font-style: italic;
+}
+
+/* 3. Nav Links (The "Pill" Hover Effect) */
+.nav-options {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-link {
+    color: #e0e0e0 !important;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 8px 16px;
+    border-radius: 50px; /* Rounded Pill Shape */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth Physics */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover State: Light Shaded Background + Lift */
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.15); /* Glass effect */
+    color: #fff !important;
+    transform: translateY(-2px); /* Float up */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Shadow below */
+    text-shadow: 0 0 8px rgba(255,255,255,0.4); /* Text Glow */
+}
+
+/* Active/Current Page Indicator (Optional line at bottom) */
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0%;
+    height: 2px;
+    background: #febd69;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
+    width: 70%; /* Expands line on hover */
+}
+
+/* 4. Cart Icon Special Styling */
+.cart-nav-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    transition: all 0.3s ease;
+}
+
+.cart-nav-item:hover {
+    background: rgba(254, 189, 105, 0.2); /* Orange Tint */
+    transform: scale(1.1) rotate(5deg); /* Rotate slightly */
+}
+
+.cart-nav-item i {
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+.cart-nav-item:hover i {
+    color: #febd69;
+}
+
+/* Cart Badge Pop */
+.cart-badge {
+    top: -5px !important;
+    right: -5px !important;
+    background: #d35400;
+    border: 2px solid #232f3e; /* Border matches header to cut visually */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* 5. Account Button (User Circle) */
+.account-btn {
+    width: 42px; 
+    height: 42px;
+    background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+    color: #131921 !important;
+    border: 2px solid transparent;
+    font-weight: 800;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.1); /* Ring effect */
+}
+
+.account-btn:hover {
+    transform: scale(1.1);
+    background: #febd69;
+    color: #131921 !important;
+    box-shadow: 0 0 15px rgba(254, 189, 105, 0.6); /* Gold Glow */
+    border-color: #fff;
+}
+
+/* =========================================
+   MOBILE TWEAKS FOR NEW NAVBAR
+   ========================================= */
+@media only screen and (max-width: 768px) {
+    .nav-options {
+        width: 100%;
+        justify-content: space-evenly; /* Spread items */
+        padding-top: 10px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        margin-top: 10px;
+    }
+    
+    .nav-link {
+        padding: 6px 12px; /* Smaller pills */
+        font-size: 0.85rem;
+    }
+    
+    /* On mobile, remove lift to save space */
+    .nav-link:hover {
+        transform: none;
+    }
+}
+
+
+/* =========================================
+   1. NAVBAR CLEANUP (Reverted to Clean Style)
+   ========================================= */
+header {
+    background-color: #131921 !important; /* Amazon Dark */
+    padding: 10px 0 !important;
+    box-shadow: none !important;
+    background: none !important; /* Remove gradient */
+}
+
+.navbar-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    width: 96%;
+    margin: 0 auto;
+}
+
+.brand-logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white !important;
+    text-decoration: none;
+    text-shadow: none !important;
+}
+.brand-logo span { color: #febd69; font-style: normal; }
+
+.nav-options {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.nav-link {
+    color: white !important;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+.nav-link:hover {
+    color: #febd69 !important;
+    transform: none !important;
+    text-decoration: underline;
+}
+/* Remove weird lines */
+.nav-link::after { display: none !important; }
+
+/* Cart Icon Fix */
+.cart-nav-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto !important;
+    height: auto !important;
+    background: none !important; /* Remove circle background */
+    padding: 5px;
+}
+.cart-nav-item i { font-size: 1.4rem; color: white; }
+
+/* Cart Badge (The Number) */
+.cart-badge {
+    position: absolute;
+    top: -8px !important;
+    right: -10px !important;
+    background-color: #f08804;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Account Button */
+.account-btn {
+    width: 40px; height: 40px;
+    background: white; color: #131921;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; text-decoration: none;
+    border: 2px solid #febd69;
+    box-shadow: none !important;
+}
+
+
+/* =========================================
+   2. FILTER VISIBILITY FIXES
+   ========================================= */
+
+/* DESKTOP: Hide Mobile Toggle Button */
+#mobile-filter-btn {
+    display: none !important;
+}
+
+/* MOBILE: Show Toggle & Style Dropdown */
+@media only screen and (max-width: 768px) {
+    
+    /* Show Button Only on Mobile */
+    #mobile-filter-btn {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding: 12px 15px;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        color: #333;
+    }
+
+    /* Neat Dropdown Styling */
+    .filter-sidebar {
+        display: none; /* Hidden by default */
+        background: white;
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    /* Visible State */
+    .filter-sidebar.show-filters {
+        display: block !important;
+    }
+
+    /* Navbar Stacking for Mobile */
+    .navbar-top {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 0 !important;
+    }
+    .nav-options {
+        width: 100%;
+        justify-content: space-around;
+        gap: 0;
+    }
+}
+
+
+/* =========================================
+   FIX: RESTORE NAVBAR APPEARANCE
+   ========================================= */
+
+/* 1. Force Dark Background (Overriding the 'background: none' bug) */
+header {
+    background-color: #131921 !important;
+    background: #131921 !important; /* This ensures color stays */
+    color: white !important;
+    padding: 10px 0 !important;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
+    width: 100%;
+}
+
+/* 2. Ensure Text is White */
+.nav-link {
+    color: #ffffff !important;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.nav-link:hover {
+    color: #febd69 !important;
+}
+
+/* 3. Logo Fix */
+.brand-logo {
+    color: #ffffff !important;
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+/* 4. Mobile Specific Layout Fixes */
+@media only screen and (max-width: 768px) {
+    
+    /* Make Header Taller to fit stacked items */
+    header {
+        padding: 15px 0 !important;
+        height: auto !important;
+    }
+
+    /* Stack Logo on top, Menu below */
+    .navbar-top {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 15px !important;
+    }
+
+    /* Center the Navigation Links */
+    .nav-options {
+        width: 100% !important;
+        justify-content: center !important;
+        gap: 25px !important;
+    }
+
+    /* Fix Hero Banner Text Size (Was too big) */
+    .hero-banner h1 {
+        font-size: 1.5rem !important;
+        margin-bottom: 10px !important;
+    }
+    
+    .hero-banner p {
+        font-size: 0.9rem !important;
+    }
+    
+    /* Fix Cart Badge Position on Mobile */
+    .cart-nav-item {
+        position: relative;
+        padding: 5px;
+    }
+    
+    .cart-badge {
+        top: -5px !important;
+        right: -8px !important;
+    }
+}
+
+
+/* =========================================
+   FIX: CART SIZE & PAGE TRANSITIONS
+   ========================================= */
+
+/* 1. Global Page Transition (Smooth Fade) */
+#main-content {
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.fade-out {
+    opacity: 0 !important;
+    transform: translateY(10px) !important; /* Subtle slide down effect */
+}
+
+/* 2. Desktop Cart Icon Sizing */
+.cart-nav-item {
+    position: relative;
+    width: 40px !important;  /* Fixed small width */
+    height: 40px !important; /* Fixed small height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.1); /* Subtle background */
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.cart-nav-item:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.cart-nav-item i {
+    font-size: 1.2rem !important; /* Force normal icon size */
+    color: #ffffff;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -2px !important;
+    right: -2px !important;
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 0.7rem !important;
+    line-height: 18px; /* Center text vertically */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f08804;
+    border: 2px solid #131921; /* Cutout effect against dark header */
+}
+
+/* 3. Mobile Specific Overrides */
+@media only screen and (max-width: 768px) {
+    
+    /* Ensure container fits screen during transition */
+    #main-content {
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* Mobile Cart Sizing */
+    .cart-nav-item {
+        width: 36px !important;
+        height: 36px !important;
+        margin-left: 10px; /* Spacing from Wishlist */
+    }
+
+    .cart-nav-item i {
+        font-size: 1.1rem !important;
+    }
+
+    .cart-badge {
+        width: 16px !important;
+        height: 16px !important;
+        font-size: 0.65rem !important;
+        top: -4px !important;
+        right: -4px !important;
+    }
+    
+    /* Account Icon Sizing Fix */
+    .account-btn {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* =========================================
+   FLUID APPLE-STYLE PAGE TRANSITIONS
+   ========================================= */
+
+/* The Container that animates */
+#main-content {
+    /* "Apple-style" ease-out curve for natural movement */
+    transition: 
+        opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+        transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+        filter 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    
+    /* Default State (Visible) */
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+    will-change: opacity, transform, filter; /* optimize performance */
+}
+
+/* The Hidden State (Applied during page swap) */
+.fade-out {
+    opacity: 0 !important;
+    /* Slight shrink and slide down for depth */
+    transform: translateY(15px) scale(0.98) !important;
+    /* Subtle blur for glass effect */
+    filter: blur(8px) !important; 
+}
+
+/* Loading Bar (Optional visual cue at top) */
+#nprogress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #febd69, #f08804);
+    width: 0%;
+    z-index: 99999;
+    transition: width 0.4s ease;
+}
+/* =========================================
+   FIX: REMOVE LOADING LINE (Keep Animations)
+   ========================================= */
+#nprogress-bar {
+    display: none !important; /* Hide the orange line */
+    height: 0 !important;
+    opacity: 0 !important;
+}
+
+/* =========================================
+   FIX: FOOTER RESTORATION & LAYOUT
+   ========================================= */
+
+/* Ensure Body Flex allows Footer at Bottom */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#main-content {
+    flex: 1; /* Pushes footer down if content is short */
+    width: 100%;
+}
+
+/* Footer Container styling */
+.zen-footer {
+    background-color: #232F3E;
+    color: white;
+    width: 100%;
+    margin-top: auto; /* Extra safety to push to bottom */
+}
+
+/* Desktop Grid */
+.zen-foot-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
+    padding: 40px 20px;
+    flex-wrap: wrap;
+}
+
+.zen-foot-col {
+    min-width: 160px;
+    margin-bottom: 20px;
+}
+
+.zen-foot-logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+.zen-foot-logo span { color: #febd69; }
+
+/* Mobile Specific Stacking */
+@media only screen and (max-width: 768px) {
+    .zen-foot-container {
+        flex-direction: column;
+        align-items: flex-start; /* Left align looks better on mobile lists */
+        padding: 30px 20px;
+    }
+
+    .zen-foot-col {
+        width: 100%;
+        margin-bottom: 30px;
+        border-bottom: 1px solid #3a4553; /* Separator for mobile sections */
+        padding-bottom: 15px;
+    }
+    
+    .zen-foot-col:last-child {
+        border-bottom: none;
+    }
+
+    .zen-foot-head {
+        font-size: 1.1rem;
+        color: white;
+        margin-bottom: 15px;
+    }
+
+    .zen-foot-link {
+        font-size: 0.95rem;
+        display: block;
+        padding: 5px 0; /* Larger touch target */
+    }
+}
+
+
+/* =========================================
+   FIX: CART ICON & BADGE VISIBILITY
+   ========================================= */
+
+/* 1. Container for Icon + Badge */
+.cart-nav-item {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 50px !important; /* Ensure enough width */
+    height: 40px !important;
+    margin-right: 10px !important; /* Spacing from profile circle */
+    text-decoration: none !important;
+}
+
+/* 2. The Cart Icon Itself */
+.cart-nav-item i {
+    font-size: 1.4rem !important;
+    color: #ffffff !important;
+    z-index: 1 !important;
+}
+
+/* 3. The Badge (Number) */
+.cart-badge {
+    position: absolute !important;
+    top: -5px !important;    /* Move up slightly */
+    right: 0px !important;   /* Align to right edge of container */
+    
+    background-color: #f08804 !important; /* Amazon Orange */
+    color: #111 !important;  /* Dark text for readability */
+    
+    border-radius: 50% !important;
+    width: 20px !important;
+    height: 20px !important;
+    
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    font-size: 0.75rem !important;
+    font-weight: 800 !important;
+    border: 2px solid #131921 !important; /* Dark border matches header to create "cutout" look */
+    z-index: 10 !important; /* Ensure on top */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+}
+
+/* 4. Mobile Adjustments */
+@media only screen and (max-width: 768px) {
+    .cart-nav-item {
+        margin-right: 0 !important; /* Reset margin on mobile if needed */
+        width: 45px !important;
+    }
+    
+    .cart-nav-item i {
+        font-size: 1.3rem !important;
+    }
+
+    .cart-badge {
+        width: 18px !important;
+        height: 18px !important;
+        font-size: 0.7rem !important;
+        top: -2px !important;
+        right: -2px !important;
+    }
+}
+
+
+/* =========================================
+   FIX: MOBILE POLISH (NAVBAR & BANNER)
+   ========================================= */
+@media only screen and (max-width: 768px) {
+    
+    /* 1. Navbar Spacing Fix */
+    .navbar-top {
+        padding: 15px 20px !important; /* Add side padding */
+    }
+
+    .nav-options {
+        width: 100% !important;
+        justify-content: center !important; /* Center the group */
+        gap: 20px !important; /* Add space between items */
+        flex-wrap: wrap !important; /* Allow wrapping if screen is very small */
+    }
+
+    .nav-link {
+        margin: 0 5px !important; /* Extra breathing room for links */
+    }
+
+    /* 2. Welcome Banner Full Width Fix */
+    /* This forces the banner to ignore parent container padding */
+    .hero-banner {
+        width: 100vw !important;          /* Force full viewport width */
+        margin-left: -50vw !important;    /* Pull left to edge */
+        left: 50% !important;             /* Center relative to parent */
+        position: relative !important;    
+        right: 50% !important;
+        
+        border-radius: 0 !important;      /* Sharp corners for full width look */
+        padding: 60px 15px !important;    /* Maintain internal spacing */
+        margin-bottom: 25px !important;
+        box-sizing: border-box !important;
+    }
+}
+
+
+/* =========================================
+   FIX: MOBILE NAVBAR SINGLE LINE
+   ========================================= */
+@media only screen and (max-width: 768px) {
+    
+    /* 1. Force items to stay in one row (No Wrapping) */
+    .nav-options {
+        display: flex !important;
+        flex-wrap: nowrap !important;       /* CRITICAL: Stop dropping to next line */
+        justify-content: space-between !important; /* Spread items out */
+        align-items: center !important;
+        width: 100% !important;
+        gap: 0 !important;                  /* Remove default large gaps */
+        padding: 0 5px !important;          /* Minimal padding on edges */
+    }
+
+    /* 2. Shrink Text Links slightly to fit */
+    .nav-link {
+        font-size: 0.85rem !important;      /* Slightly smaller text */
+        padding: 5px 6px !important;        /* Tighten padding around text */
+        margin: 0 !important;               /* Remove margins */
+        white-space: nowrap !important;     /* Prevent text from breaking */
+    }
+
+    /* 3. Adjust Icons (Cart & Account) */
+    .cart-nav-item {
+        margin: 0 5px !important;           /* Small spacing around cart */
+        width: 35px !important;             /* Compact width */
+    }
+
+    .account-btn {
+        width: 35px !important;             /* Compact size */
+        height: 35px !important;
+        font-size: 0.9rem !important;
+        flex-shrink: 0 !important;          /* Prevent button from getting squished */
+    }
+
+    /* 4. Ensure the Badge stays nice */
+    .cart-badge {
+        right: -5px !important;
+    }
+}

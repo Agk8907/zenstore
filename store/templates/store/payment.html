@@ -1,0 +1,131 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+<div style="display: flex; justify-content: center; gap:30px; flex-wrap:wrap;">
+    <div style="flex:2; min-width:300px;">
+        <div class="box-element">
+            <h2 style="color:#C7511F; border-bottom:1px solid #eee; padding-bottom:10px;">2. Review your order</h2>
+            <div style="margin-bottom:20px;">
+                <div style="display:flex; justify-content:space-between;">
+                    <h4 style="margin-bottom:5px;">Shipping to:</h4>
+                    <a href="{% url 'checkout' %}" style="color:#007185; font-size:0.9rem;">Change</a>
+                </div>
+                <p style="margin:2px 0;"><strong>{{request.user.first_name}} {{request.user.last_name}}</strong></p>
+                <p style="margin:2px 0;">{{request.user.address}}, {{request.user.city}} - {{request.user.zipcode}}</p>
+                <p style="margin:2px 0;">Phone: {{request.user.phone_number}}</p>
+            </div>
+            <hr style="border-top:1px solid #eee;">
+            <h4>Items to be delivered</h4>
+            {% for item in items %}
+            <div style="display:flex; gap:15px; margin-bottom:15px; align-items:center;">
+                <img src="{{item.product.imageURL}}" style="width:60px; height:60px; object-fit:contain;">
+                <div>
+                    <div style="font-weight:bold;">{{item.product.name}}</div>
+                    <div style="color:#B12704; font-weight:bold;">₹{{item.product.price}}</div>
+                    <div style="font-size:0.9rem;">Qty: {{item.quantity}}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div style="flex:1; min-width:280px;">
+        <div class="box-element" style="position:sticky; top:100px;">
+            <button id="open-payment-btn" class="btn" style="width:100%; margin-bottom:15px; border-radius:8px;">Make Payment</button>
+            <h3 style="margin-top:0;">Order Summary</h3>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                <span>Items ({{order.get_cart_items}}):</span><span>₹{{order.get_cart_total}}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                <span>Delivery:</span><span style="color:#007600;">FREE</span>
+            </div>
+            <hr>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:1.3rem; color:#B12704; font-weight:bold;">
+                <span>Order Total:</span><span>₹{{order.get_cart_total}}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="payment-modal-overlay" id="payment-modal">
+    <div class="payment-modal">
+        <div class="payment-header">
+            <h3><i class="fas fa-lock secure-icon"></i> Secure Payment</h3>
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="payment-body">
+            <div class="card-input-group">
+                <label class="card-label">Card Number</label>
+                <input type="text" class="card-input" placeholder="0000 0000 0000 0000" maxlength="19">
+            </div>
+            
+            <div class="card-row">
+                <div class="card-input-group">
+                    <label class="card-label">Expiry</label>
+                    <input type="text" class="card-input" placeholder="MM/YY" maxlength="5">
+                </div>
+                <div class="card-input-group">
+                    <label class="card-label">CVV</label>
+                    <input type="password" class="card-input" placeholder="123" maxlength="3">
+                </div>
+            </div>
+            
+            <button id="confirm-pay-btn" class="pay-now-btn">Pay ₹{{order.get_cart_total}}</button>
+            
+            <div style="text-align:center; margin-top:15px; font-size:0.8rem; color:#999;">
+                <i class="fas fa-shield-alt"></i> 256-bit SSL Secured
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById('payment-modal');
+    const openBtn = document.getElementById('open-payment-btn');
+    const confirmBtn = document.getElementById('confirm-pay-btn');
+
+    // Open Modal
+    openBtn.addEventListener('click', () => {
+        modal.classList.add('active');
+    });
+
+    // Close Modal
+    function closeModal() {
+        modal.classList.remove('active');
+    }
+
+    // Close on click outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    // Payment Logic
+    confirmBtn.addEventListener('click', function(){
+        const btn = this;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+        btn.disabled = true;
+
+        // Simulate Delay
+        setTimeout(() => {
+            fetch('/verify_payment/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getToken('csrftoken') },
+                body: JSON.stringify({}) 
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    btn.innerHTML = '<i class="fas fa-check"></i> Success!';
+                    btn.style.background = "#10b981";
+                    if(typeof Toast !== 'undefined') Toast.show("Payment Successful! Receipt Sent.", "success");
+                    setTimeout(() => { window.location.href = "{% url 'home' %}"; }, 1500);
+                } else {
+                    btn.innerHTML = "Retry Payment";
+                    btn.disabled = false;
+                    if(typeof Toast !== 'undefined') Toast.show("Payment Error: " + data.message, "error");
+                }
+            });
+        }, 2000);
+    });
+</script>
+{% endblock content %}

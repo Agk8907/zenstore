@@ -1,0 +1,20 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+    <div class="hero-banner">
+        <h1>Welcome to ZenStore</h1>
+        <p>Browse our exclusive collections</p>
+    </div>
+
+    <h2 style="text-align:center;">Shop by Category</h2>
+    <div class="category-grid">
+        {% for cat in categories %}
+        <div class="category-card" onclick="loadPage('{% url 'products' %}?category={{cat.id}}')">
+            <div class="cat-img" style="background-image: url('{{cat.image.url}}'); background-size:cover;"></div>
+            <h3>{{cat.name}}</h3>
+        </div>
+        {% empty %}
+        <p>No categories found. <a href="/admin">Add some in Admin</a></p>
+        {% endfor %}
+    </div>
+{% endblock content %}
