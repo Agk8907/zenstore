@@ -206,7 +206,7 @@ else:
 # ==============================================
 # STATIC FILES CONFIGURATION (CSS/JS)
 # ==============================================
-STATIC_URL = '/static/'
+
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Production Settings (Render)
@@ -219,3 +219,31 @@ if 'RENDER' in os.environ:
 else:
     # Local settings
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_local')
+
+
+# ==============================================
+# FINAL PRODUCTION CONFIGURATION
+# ==============================================
+import os
+
+# 1. STATIC FILES (CSS/JS) - SERVED BY WHITENOISE
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Enable WhiteNoise Compression
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# 2. MEDIA FILES (IMAGES) - SERVED BY CLOUDINARY
+if 'RENDER' in os.environ:
+    # Production: Use Cloudinary
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+        'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+        'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+    }
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    # Note: We do NOT set MEDIA_URL manually for Cloudinary, the library handles it.
+else:
+    # Localhost: Use Hard Drive
+    MEDIA_URL = '/images/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
