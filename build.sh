@@ -5,7 +5,8 @@ set -o errexit
 # Install dependencies
 pip install -r requirements.txt
 
-# Convert static files
+# CRITICAL: Collect static files into one folder for WhiteNoise
+echo "Collecting Static Files..."
 python manage.py collectstatic --no-input
 
 # Apply database migrations

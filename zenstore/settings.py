@@ -190,7 +190,7 @@ else:
 # ==============================================
 # STATIC FILES (CSS/JS) CONFIGURATION
 # ==============================================
-STATIC_URL = '/static/'
+
 
 if not DEBUG:
     # Production (Render)
@@ -201,3 +201,21 @@ else:
     STATICFILES_DIRS = [
         os.path.join(BASE_DIR, 'static')
     ]
+
+
+# ==============================================
+# STATIC FILES CONFIGURATION (CSS/JS)
+# ==============================================
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# Production Settings (Render)
+if 'RENDER' in os.environ:
+    # Tell Django where to copy files for deployment
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    
+    # Enable WhiteNoise to compress and cache files
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+else:
+    # Local settings
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_local')
