@@ -8,6 +8,8 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
+    'cloudinary_storage',
+    'cloudinary',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -134,8 +136,8 @@ if 'RENDER' in os.environ:
     
     # 1. Ensure Cloudinary Apps are loaded
     INSTALLED_APPS += [
-        'cloudinary_storage',
-        'cloudinary',
+        
+        
     ]
 
     # 2. Configure Keys
@@ -155,5 +157,31 @@ if 'RENDER' in os.environ:
 else:
     # Localhost settings
     print("--- LOCAL MODE: USING HARD DRIVE STORAGE ---")
+    MEDIA_URL = '/images/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
+
+
+# ==============================================
+# ROBUST MEDIA CONFIGURATION
+# ==============================================
+import os
+
+# Force Cloudinary on Render
+if 'RENDER' in os.environ:
+    print("--- SETTINGS: CONFIGURING CLOUDINARY ---")
+    
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+        'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+        'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+    }
+    
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    
+    # Ensure we don't use local URLs
+    MEDIA_URL = 'https://res.cloudinary.com/' + os.environ.get('CLOUDINARY_CLOUD_NAME') + '/'
+    
+else:
+    print("--- SETTINGS: CONFIGURING LOCAL STORAGE ---")
     MEDIA_URL = '/images/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')

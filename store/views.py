@@ -12,6 +12,19 @@ from .forms import CreateUserForm, UserLoginForm
 from django.contrib.auth import login, logout
 from django.contrib import messages
 
+def home(request):
+    data = get_cart_data(request)
+    categories = Category.objects.all()
+    
+    # --- DEBUG PRINT ---
+    products = Product.objects.all()[:3]
+    for p in products:
+        print(f"[DEBUG] Product: {p.name} | Image URL: {p.imageURL}")
+    # -------------------
+    
+    return render(request, 'store/home.html', {'categories': categories, 'cartItems': data['cartItems']})
+
+
 # --- HELPER ---
 def get_cart_data(request):
     if request.user.is_authenticated:
@@ -61,10 +74,7 @@ def verify_payment(request):
     return JsonResponse({'status': 'error'})
 
 # --- STANDARD VIEWS (Unchanged) ---
-def home(request):
-    data = get_cart_data(request)
-    categories = Category.objects.all()
-    return render(request, 'store/home.html', {'categories': categories, 'cartItems': data['cartItems']})
+
 
 def products(request):
     data = get_cart_data(request)
