@@ -20,5 +20,4 @@ urlpatterns = [
     # NEW PAYMENT ROUTES
     path('initiate_payment/', views.initiate_payment, name="initiate_payment"),
     path('verify_payment/', views.verify_payment, name="verify_payment"),
-    path('create-admin-secret/', views.create_superuser_view, name='create_superuser'),
 ]

@@ -194,19 +194,6 @@ def loginPage(request):
 
 def logoutUser(request): logout(request); return redirect('login')
 
-# ==========================================
-# SECRET ADMIN CREATOR (FOR RENDER DEPLOY)
-# ==========================================
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 
-def create_superuser_view(request):
-    User = get_user_model()
-    try:
-        if not User.objects.filter(email='admin@example.com').exists():
-            User.objects.create_superuser(username='admin', email='admin@example.com', password='password')
-            return HttpResponse("<h1>SUCCESS!</h1><p>Superuser created.</p><p>Email: <b>admin@example.com</b></p><p>Password: <b>password</b></p><p><a href='/admin'>Go to Admin Panel</a></p>")
-        else:
-            return HttpResponse("<h1>ALREADY EXISTS</h1><p>Superuser 'admin@example.com' already exists.</p><p><a href='/admin'>Go to Admin Panel</a></p>")
-    except Exception as e:
-        return HttpResponse(f"<h1>ERROR</h1><p>{str(e)}</p>")
