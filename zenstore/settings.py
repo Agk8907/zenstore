@@ -102,3 +102,22 @@ else:
 if 'RENDER' in os.environ:
     DEBUG = False
     SECRET_KEY = os.environ.get('SECRET_KEY', 'default-insecure-key')
+
+# ==============================================
+# CLOUDINARY STORAGE (FOR IMAGES ON RENDER)
+# ==============================================
+import os
+
+# Only use Cloudinary if keys are present (Production)
+if 'CLOUDINARY_CLOUD_NAME' in os.environ:
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+        'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+        'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+    }
+    # Tell Django to use Cloudinary for 'ImageField'
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+else:
+    # Localhost fallback
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
